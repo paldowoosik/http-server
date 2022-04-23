@@ -86,7 +86,7 @@ public class Server {
         for (int i = 1; i <= (msgs.length)/2+1; i+=2) {
             result.append("    \"").append(msgs[i]).append("\": ")
                   .append(msgs[i+1]).append("\"");
-            if (i != (msgs.length)/2)
+            if (i != (msgs.length)/2) // 조건 다른거 찾아봐야함..
                 result.append(",");
             result.append(lineSeparator());
         }
