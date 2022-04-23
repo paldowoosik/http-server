@@ -47,7 +47,7 @@ public class Server {
                     String[] msgs = query.split("\\?|=|&");
                     getVo = new GetVo(parseMsgs(msgs), host, host+query);
                 } else {
-                    getVo = new GetVo(host, host+query);
+                    getVo = new GetVo("", host, host+query);
                 }
                 responseBody = getVo.getsResponseBody();
                 responseHeader = initResponseHeader(getVo.getsResponseBody().length());
@@ -55,11 +55,11 @@ public class Server {
 
             }
 
-
-            System.out.println("request\n"+request);
-            System.out.println("query\n"+query);
-            System.out.println("responseHeader\n"+responseHeader);
-            System.out.println("responsebody\n"+responseBody);
+//            확인을 위한 출력
+//            System.out.println("request\n"+request);
+//            System.out.println("query\n"+query);
+//            System.out.println("responseHeader\n"+responseHeader);
+//            System.out.println("responsebody\n"+responseBody);
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream()))) {
                 writer.write(String.valueOf(responseHeader));
@@ -80,17 +80,19 @@ public class Server {
         }
     }
 
-//    private static String parseMsgs(String[] msgs) {
-//        StringBuilder result = new StringBuilder();
-//        result.append(lineSeparator());
-//        for (int i = 1; i < msgs.length; i++) {
-//            result.append("    \"").append(msgs[i]).append("\": ");
-//            if (i != msgs.length-1)
-//                result.append(",");
-//            result.append(lineSeparator());
-//        }
-//        return result.toString();
-//    }
+    private static String parseMsgs(String[] msgs) {
+        StringBuilder result = new StringBuilder();
+        result.append(lineSeparator());
+        for (int i = 1; i <= (msgs.length)/2+1; i+=2) {
+            result.append("    \"").append(msgs[i]).append("\": ")
+                  .append(msgs[i+1]).append("\"");
+            if (i != (msgs.length)/2)
+                result.append(",");
+            result.append(lineSeparator());
+        }
+        result.append("  ");
+        return result.toString();
+    }
 
     static StringBuilder initResponseHeader(int responseBodyLength) {
         StringBuilder responseHeader = new StringBuilder();
