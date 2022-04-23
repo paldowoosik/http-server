@@ -6,6 +6,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.nhnacademy.httpserver.vo.PostVo;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -22,7 +23,7 @@ public class Server {
         // http://192.168.71.79/get
         // backlog- 들어오는 연결 대기열의 요청된 최대 길이입니다.
         try (ServerSocket serverSocket = new ServerSocket(80, 50,
-            InetAddress.getByName("192.168.71.79"))) {
+            InetAddress.getByName("192.168.0.8"))) {
             Socket socket = serverSocket.accept();
 
             byte[] bytes = new byte[2048];
@@ -31,6 +32,9 @@ public class Server {
             String request = new String(bytes, 0, numberOfBytes, UTF_8);
 
             ObjectMapper mapper = new ObjectMapper();
+
+            PostVo postVo = new PostVo(239, "192.168.0.8", "http://test-vm.com/post");
+            System.out.println(postVo);
 
             // 응답 본문
             ObjectNode payload = mapper.createObjectNode();
