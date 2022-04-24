@@ -54,7 +54,7 @@ public class Server {
                 responseBody = getVo.voResponseBody();
                 responseHeader = initResponseHeader(responseBody.length());
             } else if (query.equals("/post")) {
-                PostVo postVo = new PostVo(origin, origin+query);
+                PostVo postVo = new PostVo(hostName, origin, hostName+query);
                 responseBody = postVo.voResponseBody();
                 responseHeader = initResponseHeader(responseBody.length());
             }

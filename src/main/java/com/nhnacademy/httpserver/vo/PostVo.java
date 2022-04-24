@@ -6,8 +6,10 @@ public class PostVo implements Response {
     private String origin;
     private String url;
     private String data;
+    private String host;
 
-    public PostVo(String origin, String url) {
+    public PostVo(String host, String origin, String url) {
+        this.host = "\""+host+"\"";
         this.origin = origin;
         this.url = url;
     }
@@ -22,10 +24,9 @@ public class PostVo implements Response {
                     .append("  \"form\": {},").append(lineSeparator())
                     .append("  \"headers\": {").append(lineSeparator())
                     .append("    \"Accept\": \"*/*\",").append(lineSeparator())
-                    .append("    \"Host\": \"test-vm.com\",").append(lineSeparator())
+                    .append("    \"Host\": ").append(host).append(",").append(lineSeparator())
                     .append("    \"User-Agent\": \"curl/7.64.1\",").append(lineSeparator())
                     .append("  },").append(lineSeparator());
-
         return responseBody;
     }
 }
