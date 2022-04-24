@@ -36,7 +36,7 @@ public class Server {
             ObjectNode payload = mapper.createObjectNode();
 
             String origin = socket.getInetAddress().getHostAddress();
-            String hostName = socket.getInetAddress().getHostName();
+            String hostName = request.split("\r\n")[1].split(": ")[1];
             payload.put("origin", origin);
 
             StringBuilder responseHeader = new StringBuilder();
@@ -119,10 +119,10 @@ public class Server {
     private static String parseMsgs(String[] msgs) {
         StringBuilder result = new StringBuilder();
         result.append(lineSeparator());
-        for (int i = 1; i <= (msgs.length)/2+1; i+=2) {
+        for (int i = 1; i < msgs.length; i+=2) {
             result.append("    \"").append(msgs[i]).append("\": ")
-                  .append(msgs[i+1]).append("\"");
-            if (i < (msgs.length)/2)
+                  .append("\"").append(msgs[i+1]).append("\"");
+            if (i < msgs.length - 2)
                 result.append(",");
             result.append(lineSeparator());
         }
@@ -133,7 +133,6 @@ public class Server {
     static StringBuilder initResponseHeader(int responseBodyLength) {
         StringBuilder responseHeader = new StringBuilder();
         responseHeader.append("HTTP/1.1 200 OK").append(lineSeparator())
-                         // FIXME: Date 를 yoda time으로 바꾸기
                          .append("Date: " + new Date()).append(lineSeparator())
                          .append("Content-Type: application/json").append(lineSeparator())
                          .append("Content-Length: ").append(responseHeader.length() + responseBodyLength).append(lineSeparator())
