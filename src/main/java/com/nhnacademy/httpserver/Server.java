@@ -69,7 +69,7 @@ public class Server {
                 }
                 responseBody = getVo.voResponseBody();
                 responseHeader = initResponseHeader(responseBody.length());
-            } else if (query.equals("/post") && contentType.equals("aplication/json")) {
+            } else if (query.equals("/post") && contentType.equals("application/json")) {
 
                 DataPropertySetter dataPropertySetter = new DataPropertySetter();
                 dataPropertySetter.setProperty(request);
