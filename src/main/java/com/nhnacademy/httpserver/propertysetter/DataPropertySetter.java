@@ -1,15 +1,12 @@
 package com.nhnacademy.httpserver.propertysetter;
 
-public class DataPropertySetter implements PropertySetter {
-
-    String dataProperty;
-
+public class DataPropertySetter extends CommonPropertySetter {
     @Override
     public void setProperty(String request) {
-        dataProperty = request.split("\r\n\r\n")[1];
+         super.setProperties(request.split("\r\n\r\n")[1]);
     }
 
     public String getDataProperty() {
-        return dataProperty;
+        return super.getProperties();
     }
 }
