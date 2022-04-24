@@ -6,9 +6,12 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.nhnacademy.httpserver.propertysetter.ContentPropertySetter;
+import com.nhnacademy.httpserver.propertysetter.DataPropertySetter;
+import com.nhnacademy.httpserver.propertysetter.JsonPropertySetter;
 import com.nhnacademy.httpserver.vo.GetVo;
 import com.nhnacademy.httpserver.vo.IpVo;
-import com.nhnacademy.httpserver.vo.PostVo;
+import com.nhnacademy.httpserver.vo.PostMultipartVo;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -35,10 +38,22 @@ public class Server {
             String hostName = socket.getInetAddress().getHostName();
             payload.put("origin", origin);
 
-            StringBuilder responseHeader = null;
-            StringBuilder responseBody = null;
+            StringBuilder responseHeader = new StringBuilder();
+            StringBuilder responseBody = new StringBuilder();
+
+            String argsProperty = "";
+            String dataProperty = "";
+            String jsonProperty = "";
+            String contentType = "";
 
             String query = request.split(lineSeparator())[0].split(" ")[1];
+
+            if (!query.startsWith("/get")) {
+                ContentPropertySetter contentPropertySetter = new ContentPropertySetter();
+                contentPropertySetter.setProperty(request);
+                contentType = contentPropertySetter.getContentProperty();
+            }
+
             if (query.equals("/ip")){
                 IpVo ipVo = new IpVo(origin);
                 responseBody = ipVo.voResponseBody();
@@ -53,9 +68,43 @@ public class Server {
                 }
                 responseBody = getVo.voResponseBody();
                 responseHeader = initResponseHeader(responseBody.length());
-            } else if (query.equals("/post")) {
-                PostVo postVo = new PostVo(hostName, origin, hostName+query);
-                responseBody = postVo.voResponseBody();
+            } else if (query.equals("/post") && contentType.equals("aplication/json")) {
+
+                DataPropertySetter dataPropertySetter = new DataPropertySetter();
+                dataPropertySetter.setProperty(request);
+                dataProperty = dataPropertySetter.getDataProperty();
+
+                JsonPropertySetter jsonPropertySetter = new JsonPropertySetter();
+                jsonPropertySetter.setProperty(request);
+                jsonProperty = jsonPropertySetter.getJsonProperty();
+            }
+            if (query.equals("/post") && contentType.startsWith("multipart/form-data")) { // 파일인것
+                PostMultipartVo postMultipartVo = new PostMultipartVo(request, origin);
+                responseBody.append(postMultipartVo);
+                responseHeader = initResponseHeader(responseBody.length());
+            }
+
+            // 파일 업로드가 아닌곳
+            if (query.startsWith("/post") && !contentType.startsWith("multipart")){ // 기본post
+                responseBody.append("{").append(lineSeparator())
+                            .append("   \"args\": {},").append(lineSeparator())
+                            .append("   \"data\": ")
+                            .append(dataProperty).append(lineSeparator())
+                            .append("   \"files\": {},").append(lineSeparator())
+                            .append("   \"form\": {},").append(lineSeparator())
+                            .append("   \"headers\": {").append(lineSeparator())
+                            .append("      \"Accept\": \"*/*\",").append(lineSeparator())
+                            .append("      \"Content-Length\": ").append("\"").append(dataProperty.length()).append("\",").append(lineSeparator())
+                            .append("      \"Content-Type\": ").append("\"").append(contentType).append("\",").append(lineSeparator())
+                            .append("      \"Host\": \"").append(socket.getInetAddress().getHostAddress()).append("\",").append(lineSeparator())
+                            .append("      \"User-Agent\": \"curl/7.64.1\"").append(lineSeparator())
+                            .append("   },").append(lineSeparator())
+                            .append("   \"json\": {").append(lineSeparator())
+                            .append(jsonProperty)
+                            .append("   }").append(lineSeparator())
+                            .append("   \"origin\": \"").append(origin).append(",").append(lineSeparator())
+                            .append("   \"url\": \"").append(request.split("\r\n")[1].split(" ")[1]).append("\"").append(lineSeparator())
+                            .append("}").append(lineSeparator());
                 responseHeader = initResponseHeader(responseBody.length());
             }
 

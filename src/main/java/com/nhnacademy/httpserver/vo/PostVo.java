@@ -9,7 +9,7 @@ public class PostVo implements Response {
     private String host;
 
     public PostVo(String host, String origin, String url) {
-        this.host = "\""+host+"\"";
+        this.host = "\"" + host + "\"";
         this.origin = origin;
         this.url = url;
     }
