@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.nhnacademy.httpserver.vo.GetVo;
 import com.nhnacademy.httpserver.vo.IpVo;
+import com.nhnacademy.httpserver.vo.PostVo;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -30,36 +31,39 @@ public class Server {
             // 응답 본문
             ObjectNode payload = mapper.createObjectNode();
 
-            String host = socket.getInetAddress().getHostAddress();
-            payload.put("origin", host);
+            String origin = socket.getInetAddress().getHostAddress();
+            String hostName = socket.getInetAddress().getHostName();
+            payload.put("origin", origin);
 
             StringBuilder responseHeader = null;
             StringBuilder responseBody = null;
 
             String query = request.split(lineSeparator())[0].split(" ")[1];
             if (query.equals("/ip")){
-                IpVo ipVo = new IpVo(host);
-                responseBody = ipVo.ipsResponseBody();
-                responseHeader = initResponseHeader(ipVo.ipsResponseBody().length());
+                IpVo ipVo = new IpVo(origin);
+                responseBody = ipVo.voResponseBody();
+                responseHeader = initResponseHeader(responseBody.length());
             } else if (query.startsWith("/get")) {
                 GetVo getVo;
                 if (query.startsWith("/get?")) {
                     String[] msgs = query.split("\\?|=|&");
-                    getVo = new GetVo(parseMsgs(msgs), host, host+query);
+                    getVo = new GetVo(parseMsgs(msgs), hostName, origin, hostName+query);
                 } else {
-                    getVo = new GetVo("", host, host+query);
+                    getVo = new GetVo("", hostName, origin, hostName+query);
                 }
-                responseBody = getVo.getsResponseBody();
-                responseHeader = initResponseHeader(getVo.getsResponseBody().length());
+                responseBody = getVo.voResponseBody();
+                responseHeader = initResponseHeader(responseBody.length());
             } else if (query.equals("/post")) {
-
+                PostVo postVo = new PostVo(origin, origin+query);
+                responseBody = postVo.voResponseBody();
+                responseHeader = initResponseHeader(responseBody.length());
             }
 
-//            확인을 위한 출력
-//            System.out.println("request\n"+request);
-//            System.out.println("query\n"+query);
-//            System.out.println("responseHeader\n"+responseHeader);
-//            System.out.println("responsebody\n"+responseBody);
+            // 확인을 위한 출력
+            System.out.println("request\n"+request);
+            System.out.println("query\n"+query);
+            System.out.println("responseHeader\n"+responseHeader);
+            System.out.println("responsebody\n"+responseBody);
             try (BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(socket.getOutputStream()))) {
                 writer.write(String.valueOf(responseHeader));
