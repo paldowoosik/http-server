@@ -12,6 +12,7 @@ import com.nhnacademy.httpserver.propertysetter.JsonPropertySetter;
 import com.nhnacademy.httpserver.vo.GetVo;
 import com.nhnacademy.httpserver.vo.IpVo;
 import com.nhnacademy.httpserver.vo.PostMultipartVo;
+import com.nhnacademy.httpserver.vo.PostVo;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -86,25 +87,8 @@ public class Server {
 
             // 파일 업로드가 아닌곳
             if (query.startsWith("/post") && !contentType.startsWith("multipart")){ // 기본post
-                responseBody.append("{").append(lineSeparator())
-                            .append("   \"args\": {},").append(lineSeparator())
-                            .append("   \"data\": ")
-                            .append(dataProperty).append(lineSeparator())
-                            .append("   \"files\": {},").append(lineSeparator())
-                            .append("   \"form\": {},").append(lineSeparator())
-                            .append("   \"headers\": {").append(lineSeparator())
-                            .append("      \"Accept\": \"*/*\",").append(lineSeparator())
-                            .append("      \"Content-Length\": ").append("\"").append(dataProperty.length()).append("\",").append(lineSeparator())
-                            .append("      \"Content-Type\": ").append("\"").append(contentType).append("\",").append(lineSeparator())
-                            .append("      \"Host\": \"").append(socket.getInetAddress().getHostAddress()).append("\",").append(lineSeparator())
-                            .append("      \"User-Agent\": \"curl/7.64.1\"").append(lineSeparator())
-                            .append("   },").append(lineSeparator())
-                            .append("   \"json\": {").append(lineSeparator())
-                            .append(jsonProperty)
-                            .append("   }").append(lineSeparator())
-                            .append("   \"origin\": \"").append(origin).append(",").append(lineSeparator())
-                            .append("   \"url\": \"").append(request.split("\r\n")[1].split(" ")[1]).append("\"").append(lineSeparator())
-                            .append("}").append(lineSeparator());
+                PostVo postVo = new PostVo(origin, hostName+query, dataProperty, contentType, jsonProperty, hostName);
+                responseBody = postVo.voResponseBody();
                 responseHeader = initResponseHeader(responseBody.length());
             }
 
