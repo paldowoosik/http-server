@@ -42,7 +42,6 @@ public class Server {
             StringBuilder responseHeader = new StringBuilder();
             StringBuilder responseBody = new StringBuilder();
 
-            String argsProperty = "";
             String dataProperty = "";
             String jsonProperty = "";
             String contentType = "";
@@ -80,7 +79,7 @@ public class Server {
                 jsonProperty = jsonPropertySetter.getJsonProperty();
             }
             if (query.equals("/post") && contentType.startsWith("multipart/form-data")) { // 파일인것
-                PostMultipartVo postMultipartVo = new PostMultipartVo(request, origin);
+                PostMultipartVo postMultipartVo = new PostMultipartVo(request, origin, hostName, hostName+query);
                 responseBody.append(postMultipartVo);
                 responseHeader = initResponseHeader(responseBody.length());
             }

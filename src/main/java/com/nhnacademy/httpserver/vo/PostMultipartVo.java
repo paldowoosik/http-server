@@ -20,16 +20,12 @@ public class PostMultipartVo {
     String origin = "";
     String url = "";
 
-    public PostMultipartVo(String request, String origin) throws IOException {
+    public PostMultipartVo(String request, String origin, String host, String url) throws IOException {
         BufferedReader reader = new BufferedReader(new StringReader(request));
         String line = "";
         int cnt = 0;
         while (true) {
             line = reader.readLine();
-            if (line.startsWith("Host:")) {
-                this.host = line.split(" ")[1];
-                continue;
-            }
             if (line.startsWith("Accept:")) {
                 this.accept = line.split(" ")[1];
                 continue;
@@ -60,7 +56,8 @@ public class PostMultipartVo {
         this.header = "";
         this.json = null;
         this.origin = origin;
-        this.url = request.split("\r\n")[1].split(" ")[1];
+        this.url = url;
+        this.host = host;
     }
 
     @Override
